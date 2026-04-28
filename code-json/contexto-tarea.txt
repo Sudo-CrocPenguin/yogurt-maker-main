@@ -1,0 +1,52 @@
+DOCUMENTACIÓN DE API REST - YOGURT MAKER
+Integración de Swagger UI con SpringDoc OpenAPI
+
+Nombre: MIGUEL ANGEL BLANDON MONTES
+Fecha: 28/042025
+
+
+
+
+
+1. Dependencia agregada en pom.xml:
+   - springdoc-openapi-starter-webmvc-ui versión 2.8.0
+
+2. Archivo de configuración creado:
+   - SpringDocConfig.java en package config
+
+3. URLs de acceso:
+   - Swagger UI: http://localhost:8080/swagger-ui/index.html
+   - API Docs JSON: http://localhost:8080/v3/api-docs
+
+
+
+
+
+
+   Controladores documentados:
+- RecipeController: @Tag("Gestión de Recetas")
+- YogurtBatchController: @Tag("Gestión de Lotes de Producción")
+- MonitoringController: @Tag("Monitoreo de Producción")
+
+Anotaciones utilizadas:
+- @Tag: Nombre y descripción de cada módulo
+- @Operation: Resumen y descripción detallada de cada endpoint
+- @ApiResponse: Documentación de respuestas exitosas y de error
+- @Parameter: Descripción de parámetros con ejemplos
+- @Schema: Descripción de modelos y sus atributos
+
+Modelos documentados con @Schema:
+- Recipe, Ingredient, YogurtBatch, TemperatureLog
+- RecipeDTO, IngredientDTO, BatchDTO, MonitoringDTO, TemperatureRecordDTO
+
+LAS CAPTURAS DE PANTALLA ESTAN EN LA CARPETA pruebas 
+
+
+La integración de Swagger UI mediante SpringDoc OpenAPI permite:
+
+- Documentar automáticamente todos los endpoints REST
+- Probar la API directamente desde el navegador
+- Facilitar la comunicación con el equipo de Frontend
+- Mantener la documentación actualizada con el código
+- Cumplir con el estándar OpenAPI 3.0
+
