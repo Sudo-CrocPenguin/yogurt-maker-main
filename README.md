@@ -1,173 +1,201 @@
-# 🍨 Yogurt Maker API
+<div align="center">
 
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.3-brightgreen?logo=springboot)](https://spring.io/projects/spring-boot)
-[![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk)](https://openjdk.org/projects/jdk/21/)
-[![Maven](https://img.shields.io/badge/Maven-3.9.12-blue?logo=apachemaven)](https://maven.apache.org/)
-[![Swagger](https://img.shields.io/badge/Swagger-UI-85EA2D?logo=swagger)](https://swagger.io/tools/swagger-ui/)
-[![H2 Database](https://img.shields.io/badge/H2-in--memory-blue?logo=h2)](https://www.h2database.com/)
-[![Licencia](https://img.shields.io/badge/Licencia-Apache%202.0-yellow)](https://www.apache.org/licenses/LICENSE-2.0)
+# Yogurt Maker API
 
-**API REST profesional para gestionar la producción artesanal de yogurt.**  
-Crea recetas, controla lotes de producción paso a paso y monitorea temperaturas en tiempo real. Todo documentado automáticamente con **Swagger UI** y listo para ser consumido por cualquier equipo frontend.
+**API REST para gestionar producción artesanal de yogurt.**  
+Recetas, lotes de producción, control de temperatura y monitoreo — todo documentado con Swagger UI.
 
----
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.3-6DB33F?style=flat-square&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/21/)
+[![Maven](https://img.shields.io/badge/Maven-3.9-C71A36?style=flat-square&logo=apachemaven&logoColor=white)](https://maven.apache.org/)
+[![Swagger](https://img.shields.io/badge/Swagger-UI-85EA2D?style=flat-square&logo=swagger&logoColor=black)](https://swagger.io/tools/swagger-ui/)
+[![H2](https://img.shields.io/badge/H2-in--memory-004990?style=flat-square)](https://www.h2database.com/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue?style=flat-square)](https://www.apache.org/licenses/LICENSE-2.0)
 
-## 📖 Tabla de Contenidos
-
-- [🧩 Tecnologías](#-tecnologías)
-- [🏗️ Arquitectura](#️-arquitectura)
-- [📁 Estructura del Proyecto](#-estructura-del-proyecto)
-- [⚙️ Requisitos Previos](#️-requisitos-previos)
-- [🚀 Instalación y Ejecución](#-instalación-y-ejecución)
-  - [Windows](#windows)
-  - [Linux / Ubuntu](#linux--ubuntu)
-  - [macOS](#macos)
-- [📚 Documentación de la API (Swagger)](#-documentación-de-la-api-swagger)
-- [🔌 Endpoints Principales](#-endpoints-principales)
-  - [Gestión de Recetas](#1-gestión-de-recetas)
-  - [Gestión de Lotes de Producción](#2-gestión-de-lotes-de-producción)
-  - [Monitoreo de Producción](#3-monitoreo-de-producción)
-- [🗄️ Modelo de Datos](#️-modelo-de-datos)
-- [🔄 Flujo del Proceso de Yogurt](#-flujo-del-proceso-de-yogurt)
-- [🧪 Pruebas](#-pruebas)
-- [🤝 Contribución](#-contribución)
-- [📄 Licencia](#-licencia)
-- [👤 Autor](#-autor)
+</div>
 
 ---
 
-## 🧩 Tecnologías
+## ¿Qué hace esta API?
 
-| Tecnología | Uso en el proyecto |
-|------------|-------------------|
-| **Java 21** | Lenguaje principal |
-| **Spring Boot 4.0.3** | Framework backend |
-| **Spring Data JPA / Hibernate** | ORM para mapear objetos a tablas SQL |
-| **H2 Database** | Base de datos en memoria (desarrollo / pruebas) |
-| **Spring Web MVC** | Creación de API REST |
-| **SpringDoc OpenAPI 2.8.0** | Documentación automática con Swagger UI |
-| **Lombok** | Elimina boilerplate (getters, setters, constructores) |
-| **Maven** | Gestión de dependencias y construcción |
+Yogurt Maker modela el proceso real de producción artesanal de yogurt como una API REST. Podés crear recetas con sus ingredientes, iniciar lotes de producción que avanzan paso a paso, registrar temperaturas manualmente y consultar un dashboard de monitoreo en tiempo real.
+
+Está pensada como backend listo para consumir: arquitectura limpia en capas, DTOs para desacoplar la API de las entidades, manejo global de errores y documentación automática con Swagger.
 
 ---
 
-## 🏗️ Arquitectura
+## Stack
 
-El proyecto sigue una arquitectura **MVC + Capas** bien separadas:
-
-Cliente] ←→ [Controller] ←→ [Service] ←→ [Repository] ←→ [DB]
-↑ ↑ ↑ ↑
-JSON @RestController Lógica JPA/Hibernate
-(Swagger) @Tag, @Operation negocio consultas SQL
-
-
-
-- **Controller**: Recibe peticiones HTTP y delega en los servicios.
-- **Service**: Contiene la lógica de negocio y validaciones.
-- **Repository**: Interfaces JPA que acceden a la base de datos.
-- **Model / Entity**: Clases Java que representan las tablas de la BD.
-- **DTO**: Objetos de transferencia de datos para aislar la API de las entidades.
-- **Exception**: Manejo global de errores con respuestas JSON limpias.
+| Tecnología | Rol |
+|---|---|
+| Java 21 | Lenguaje principal |
+| Spring Boot 4.0.3 | Framework backend |
+| Spring Data JPA + Hibernate | ORM y acceso a datos |
+| H2 Database | Base de datos en memoria (dev/test) |
+| SpringDoc OpenAPI 2.8.0 | Swagger UI automático |
+| Lombok | Elimina boilerplate |
+| Maven Wrapper | Sin necesidad de Maven instalado |
 
 ---
 
-## 📁 Estructura del Proyecto
+## Instalación
 
+El proyecto incluye Maven Wrapper — **no necesitás tener Maven instalado**.
 
+**Requisito único:** Java 21 o superior.
+
+```bash
+java --version   # debe mostrar 21.x.x
+```
+
+### Clonar y ejecutar
+
+```bash
+git clone <url-del-repo>
+cd yogurt-maker
+```
+
+**Linux / macOS**
+```bash
+chmod +x mvnw
+./mvnw clean spring-boot:run
+```
+
+**Windows**
+```bash
+./mvnw clean spring-boot:run
+```
+
+Cuando veas `Started DemoApplication in X.XXX seconds`, la API está lista.
+
+---
+
+## Documentación interactiva
+
+Una vez iniciado el servidor, abrí Swagger UI en el navegador:
+
+```
+http://localhost:8080/swagger-ui.html
+```
+
+Desde ahí podés explorar y probar todos los endpoints sin necesidad de Postman ni ninguna herramienta adicional.
+
+---
+
+## Endpoints
+
+### Recetas
+
+```
+GET    /api/recipes           → listar todas las recetas
+GET    /api/recipes/{id}      → obtener una receta
+POST   /api/recipes           → crear receta con ingredientes
+PUT    /api/recipes/{id}      → actualizar receta
+DELETE /api/recipes/{id}      → eliminar receta
+```
+
+### Lotes de producción
+
+```
+GET    /api/batches           → listar lotes
+GET    /api/batches/{id}      → detalle de un lote
+POST   /api/batches/start     → iniciar lote desde una receta
+PUT    /api/batches/{id}/next → avanzar al siguiente paso
+PUT    /api/batches/{id}/fail → marcar lote como fallido
+```
+
+### Monitoreo y temperatura
+
+```
+GET    /api/monitoring/dashboard       → resumen general de producción
+POST   /api/monitoring/temperature     → registrar temperatura manualmente
+GET    /api/monitoring/temperature/{batchId} → historial de temperaturas de un lote
+```
+
+---
+
+## Arquitectura
+
+Capas bien separadas siguiendo MVC clásico:
+
+```
+Controller → Service → Repository → DB
+```
+
+- **Controller** — recibe peticiones HTTP, delega en servicios, no tiene lógica de negocio
+- **Service** — lógica de negocio y validaciones
+- **Repository** — interfaces JPA, consultas a la BD
+- **Model / Entity** — clases que mapean a tablas (`Recipe`, `YogurtBatch`, `Ingredient`, `TemperatureLog`)
+- **DTO** — objetos de transferencia que desacoplan la API de las entidades internas
+- **Exception** — `GlobalExceptionHandler` centraliza todos los errores y devuelve JSON limpio
+
+---
+
+## Estructura del proyecto
+
+```
 yogurt-maker/
-├── pom.xml # Configuración de Maven
-├── mvnw / mvnw.cmd # Maven Wrapper (no requiere Maven instalado)
-├── .mvn/wrapper/maven-wrapper.properties # Versión de Maven descargable
-├── src/main/java/com/danieldev87/demo/
-│ ├── DemoApplication.java # Clase principal
-│ ├── config/
-│ │ └── SpringDocConfig.java # Configuración de Swagger/OpenAPI
-│ ├── domain/
-│ │ ├── controller/
-│ │ │ ├── MonitoringController.java # Endpoints de monitoreo
-│ │ │ ├── RecipeController.java # Endpoints de recetas
-│ │ │ └── YogurtBatchController.java # Endpoints de lotes
-│ │ ├── model/
-│ │ │ ├── Ingredient.java # Entidad Ingrediente
-│ │ │ ├── Recipe.java # Entidad Receta
-│ │ │ ├── TemperatureLog.java # Entidad Registro de Temperatura
-│ │ │ └── YogurtBatch.java # Entidad Lote de Producción
-│ │ ├── repository/
-│ │ │ ├── RecipeRepository.java # Repositorio JPA de Recetas
-│ │ │ ├── TemperatureLogRepository.java
-│ │ │ └── YogurtBatchRepository.java
-│ │ └── service/
-│ │ ├── RecipeService.java # Lógica de negocio de recetas
-│ │ ├── TemperatureControlService.java # Simulación de control de temperatura
-│ │ └── YogurtMakingService.java # Lógica de producción de lotes
-│ ├── dto/
-│ │ ├── BatchDTO.java # DTOs para iniciar lote / fallo
-│ │ ├── IngredientDTO.java # DTO de ingrediente
-│ │ ├── MonitoringDTO.java # DTOs de dashboard y resumen de temp.
-│ │ ├── RecipeDTO.java # DTO de creación/actualización de receta
-│ │ └── TemperatureRecordDTO.java # DTO de registro manual de temperatura
-│ └── exception/
-│ ├── BusinessException.java # Excepción personalizada
-│ └── GlobalExceptionHandler.java # Manejador global de excepciones
-└── src/main/resources/
-└── application.properties # Configuración de BD, JPA, Swagger, etc.
-
+├── pom.xml
+├── mvnw / mvnw.cmd
+└── src/main/
+    ├── java/com/danieldev87/demo/
+    │   ├── DemoApplication.java
+    │   ├── config/
+    │   │   └── SpringDocConfig.java        # Configuración Swagger
+    │   ├── domain/
+    │   │   ├── controller/
+    │   │   │   ├── RecipeController.java
+    │   │   │   ├── YogurtBatchController.java
+    │   │   │   └── MonitoringController.java
+    │   │   ├── model/
+    │   │   │   ├── Recipe.java
+    │   │   │   ├── Ingredient.java
+    │   │   │   ├── YogurtBatch.java
+    │   │   │   └── TemperatureLog.java
+    │   │   ├── repository/
+    │   │   │   ├── RecipeRepository.java
+    │   │   │   ├── YogurtBatchRepository.java
+    │   │   │   └── TemperatureLogRepository.java
+    │   │   └── service/
+    │   │       ├── RecipeService.java
+    │   │       ├── YogurtMakingService.java
+    │   │       └── TemperatureControlService.java
+    │   ├── dto/
+    │   │   ├── RecipeDTO.java
+    │   │   ├── IngredientDTO.java
+    │   │   ├── BatchDTO.java
+    │   │   ├── MonitoringDTO.java
+    │   │   └── TemperatureRecordDTO.java
+    │   └── exception/
+    │       ├── BusinessException.java
+    │       └── GlobalExceptionHandler.java
+    └── resources/
+        └── application.properties
+```
 
 ---
 
-## ⚙️ Requisitos Previos
+## Flujo de producción
 
-- **Java 21** o superior
-- **Maven 3.9+** (opcional; el proyecto incluye Maven Wrapper)
-- **Navegador web** (Chrome, Firefox, Edge)
+Un lote sigue estos estados en orden:
 
-Para verificar tus versiones:
+```
+INICIADO → PASTEURIZANDO → ENFRIANDO → INOCULANDO → FERMENTANDO → COMPLETADO
+                                                                 ↘ FALLIDO
+```
 
-java --version   # Debe mostrar 21.x.x
-mvn --version    # (Opcional) Debe mostrar 3.9 o superior
+Cada llamada a `PUT /api/batches/{id}/next` avanza al siguiente estado. En cualquier punto podés registrar temperaturas o marcar el lote como fallido.
 
+---
 
-## 🚀 Instalación y Ejecución
+## Licencia
 
+[Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) — libre para usar, modificar y distribuir.
 
-Windows
+---
 
-# 1. Clona o descarga el proyecto
-cd C:\Users\TuUsuario\Desktop\yogurt-maker-main
+<div align="center">
 
-# 2. Ejecuta con Maven Wrapper
-./mvnw clean spring-boot:run
+_Hecho con Java, Spring y demasiado yogurt de prueba._
 
-Linux / Ubuntu
-
-# 1. Entra a la carpeta del proyecto
-cd ~/Escritorio/yogurt-maker-main
-
-# 2. Da permisos de ejecución al wrapper
-chmod +x mvnw
-
-# 3. Compila y ejecuta
-./mvnw clean spring-boot:run
-
-macOS
-
-# 1. Entra a la carpeta del proyecto
-cd ~/Desktop/yogurt-maker-main
-
-# 2. Da permisos al wrapper
-chmod +x mvnw
-
-# 3. Ejecuta
-./mvnw clean spring-boot:run
-
-
-Una vez iniciado, verás en la terminal:
-Started DemoApplication in X.XXX seconds
-
-
-
-
-
-
-
-
+</div>
