@@ -13,6 +13,7 @@ import com.danieldev87.demo.domain.repository.RecipeRepository;
 import com.danieldev87.demo.domain.repository.TemperatureLogRepository;
 import com.danieldev87.demo.domain.repository.YogurtBatchRepository;
 import com.danieldev87.demo.exception.BusinessException;
+import com.danieldev87.demo.exception.ResourceNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,11 +30,21 @@ public class YogurtMakingService {
     
     @Transactional
     public YogurtBatch startNewBatch(Long recipeId, Double customMilkVolume, Double customStarterAmount) {
+        if (recipeId == null) {
+            throw new BusinessException("Recipe id must not be null");
+        }
+
         Recipe recipe = recipeRepository.findById(recipeId)
-            .orElseThrow(() -> new BusinessException("Recipe not found with id: " + recipeId));
+            .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id: " + recipeId));
+
+        if (!Boolean.TRUE.equals(recipe.getActive())) {
+            throw new BusinessException("Inactive recipes cannot be used to start new batches");
+        }
         
         Double milkVolume = customMilkVolume != null ? customMilkVolume : recipe.getDefaultMilkVolume();
         Double starterAmount = customStarterAmount != null ? customStarterAmount : recipe.getDefaultStarterAmount();
+        validateMinimum(milkVolume, "Milk volume", 0.1);
+        validateMinimum(starterAmount, "Starter amount", 0.5);
         
         YogurtBatch batch = YogurtBatch.builder()
             .recipe(recipe)
@@ -89,8 +100,9 @@ public class YogurtMakingService {
         }
         
         batch.setStatus(YogurtBatch.BatchStatus.INCUBATING);
-        batch.setIncubationStartTime(LocalDateTime.now());
-        batch.setIncubationEndTime(LocalDateTime.now().plusHours(batch.getIncubationTime()));
+        LocalDateTime now = LocalDateTime.now();
+        batch.setIncubationStartTime(now);
+        batch.setIncubationEndTime(now.plusHours(batch.getIncubationTime()));
         
         batch = batchRepository.save(batch);
         temperatureControlService.startIncubationControl(batch);
@@ -144,9 +156,13 @@ public class YogurtMakingService {
     
     @Transactional
     public YogurtBatch markAsFailed(Long batchId, String reason) {
+        if (reason == null || reason.isBlank()) {
+            throw new BusinessException("Failure reason must not be blank");
+        }
+
         YogurtBatch batch = getBatch(batchId);
         batch.setStatus(YogurtBatch.BatchStatus.FAILED);
-        batch.setNotes("Failed: " + reason);
+        batch.setNotes("Failed: " + reason.trim());
         
         batch = batchRepository.save(batch);
         log.warn("Batch marked as failed: {}, reason: {}", batch.getBatchCode(), reason);
@@ -156,7 +172,7 @@ public class YogurtMakingService {
     
     public YogurtBatch getBatch(Long batchId) {
         return batchRepository.findById(batchId)
-            .orElseThrow(() -> new BusinessException("Batch not found with id: " + batchId));
+            .orElseThrow(() -> new ResourceNotFoundException("Batch not found with id: " + batchId));
     }
     
     public List<YogurtBatch> getAllBatches() {
@@ -168,6 +184,11 @@ public class YogurtMakingService {
     }
     
     public void recordTemperature(Long batchId, Double temperature, TemperatureLog.LogType type) {
+        if (type == null) {
+            throw new BusinessException("Temperature log type must not be null");
+        }
+        validateTemperature(temperature);
+
         YogurtBatch batch = getBatch(batchId);
         
         TemperatureLog log = TemperatureLog.builder()
@@ -178,5 +199,17 @@ public class YogurtMakingService {
             .build();
         
         temperatureLogRepository.save(log);
+    }
+
+    private void validateMinimum(Double value, String fieldName, double minimum) {
+        if (value == null || value < minimum) {
+            throw new BusinessException(fieldName + " must be greater than or equal to " + minimum);
+        }
+    }
+
+    private void validateTemperature(Double temperature) {
+        if (temperature == null || temperature < 0 || temperature > 100) {
+            throw new BusinessException("Temperature must be between 0°C and 100°C");
+        }
     }
 }

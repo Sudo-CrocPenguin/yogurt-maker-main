@@ -80,6 +80,6 @@ public class MonitoringDTO {
          */
         @Schema(description = "Número de lotes que se completaron exitosamente durante el día de hoy", 
                 example = "3")
-        private Integer completedToday;
+        private Long completedToday;
     }
 }

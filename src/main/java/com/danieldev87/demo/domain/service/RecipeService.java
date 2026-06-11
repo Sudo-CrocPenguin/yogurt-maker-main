@@ -2,7 +2,9 @@ package com.danieldev87.demo.domain.service;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.danieldev87.demo.domain.model.Ingredient;
 import com.danieldev87.demo.domain.model.Recipe;
@@ -10,8 +12,8 @@ import com.danieldev87.demo.domain.repository.RecipeRepository;
 import com.danieldev87.demo.dto.RecipeDTO;
 
 import com.danieldev87.demo.exception.BusinessException;
+import com.danieldev87.demo.exception.ResourceNotFoundException;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,12 +26,13 @@ public class RecipeService {
     
     @Transactional
     public Recipe createRecipe(RecipeDTO recipeDTO) {
-        if (recipeRepository.findByName(recipeDTO.getName()).isPresent()) {
-            throw new BusinessException("Recipe with name '" + recipeDTO.getName() + "' already exists");
+        String recipeName = normalizeName(recipeDTO.getName());
+        if (recipeRepository.findByNameIgnoreCase(recipeName).isPresent()) {
+            throw new BusinessException("Recipe with name '" + recipeName + "' already exists", HttpStatus.CONFLICT);
         }
         
         Recipe recipe = Recipe.builder()
-            .name(recipeDTO.getName())
+            .name(recipeName)
             .description(recipeDTO.getDescription())
             .defaultMilkVolume(recipeDTO.getDefaultMilkVolume())
             .defaultStarterAmount(recipeDTO.getDefaultStarterAmount())
@@ -45,20 +48,7 @@ public class RecipeService {
             .active(true)
             .build();
         
-        // Agregar ingredientes
-        if (recipeDTO.getIngredients() != null) {
-            recipeDTO.getIngredients().forEach(ingredientDTO -> {
-                Ingredient ingredient = Ingredient.builder()
-                    .name(ingredientDTO.getName())
-                    .quantity(ingredientDTO.getQuantity())
-                    .unit(ingredientDTO.getUnit())
-                    .notes(ingredientDTO.getNotes())
-                    .optional(ingredientDTO.getOptional())
-                    .recipe(recipe)
-                    .build();
-                recipe.getIngredients().add(ingredient);
-            });
-        }
+        replaceIngredients(recipe, recipeDTO);
         
         Recipe savedRecipe = recipeRepository.save(recipe);
         log.info("Recipe created: {}", savedRecipe.getName());
@@ -69,8 +59,15 @@ public class RecipeService {
     @Transactional
     public Recipe updateRecipe(Long id, RecipeDTO recipeDTO) {
         Recipe recipe = getRecipe(id);
+        String recipeName = normalizeName(recipeDTO.getName());
+
+        recipeRepository.findByNameIgnoreCase(recipeName)
+            .filter(existingRecipe -> !existingRecipe.getId().equals(id))
+            .ifPresent(existingRecipe -> {
+                throw new BusinessException("Recipe with name '" + recipeName + "' already exists", HttpStatus.CONFLICT);
+            });
         
-        recipe.setName(recipeDTO.getName());
+        recipe.setName(recipeName);
         recipe.setDescription(recipeDTO.getDescription());
         recipe.setDefaultMilkVolume(recipeDTO.getDefaultMilkVolume());
         recipe.setDefaultStarterAmount(recipeDTO.getDefaultStarterAmount());
@@ -84,21 +81,7 @@ public class RecipeService {
         recipe.setDifficulty(recipeDTO.getDifficulty());
         recipe.setTips(recipeDTO.getTips());
         
-        // Actualizar ingredientes (simplificado - en producción se manejaría mejor)
-        recipe.getIngredients().clear();
-        if (recipeDTO.getIngredients() != null) {
-            recipeDTO.getIngredients().forEach(ingredientDTO -> {
-                Ingredient ingredient = Ingredient.builder()
-                    .name(ingredientDTO.getName())
-                    .quantity(ingredientDTO.getQuantity())
-                    .unit(ingredientDTO.getUnit())
-                    .notes(ingredientDTO.getNotes())
-                    .optional(ingredientDTO.getOptional())
-                    .recipe(recipe)
-                    .build();
-                recipe.getIngredients().add(ingredient);
-            });
-        }
+        replaceIngredients(recipe, recipeDTO);
         
         Recipe updatedRecipe = recipeRepository.save(recipe);
         log.info("Recipe updated: {}", updatedRecipe.getName());
@@ -108,7 +91,7 @@ public class RecipeService {
     
     public Recipe getRecipe(Long id) {
         return recipeRepository.findById(id)
-            .orElseThrow(() -> new BusinessException("Recipe not found with id: " + id));
+            .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id: " + id));
     }
     
     public List<Recipe> getAllActiveRecipes() {
@@ -116,7 +99,10 @@ public class RecipeService {
     }
     
     public List<Recipe> searchRecipes(String keyword) {
-        return recipeRepository.searchByKeyword(keyword);
+        if (keyword == null || keyword.isBlank()) {
+            throw new BusinessException("Search keyword must not be blank");
+        }
+        return recipeRepository.searchByKeyword(keyword.trim());
     }
     
     @Transactional
@@ -133,5 +119,31 @@ public class RecipeService {
         recipe.setActive(true);
         recipeRepository.save(recipe);
         log.info("Recipe activated: {}", recipe.getName());
+    }
+
+    private String normalizeName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new BusinessException("Recipe name must not be blank");
+        }
+        return name.trim();
+    }
+
+    private void replaceIngredients(Recipe recipe, RecipeDTO recipeDTO) {
+        recipe.getIngredients().clear();
+        if (recipeDTO.getIngredients() == null) {
+            return;
+        }
+
+        recipeDTO.getIngredients().forEach(ingredientDTO -> {
+            Ingredient ingredient = Ingredient.builder()
+                .name(ingredientDTO.getName().trim())
+                .quantity(ingredientDTO.getQuantity())
+                .unit(ingredientDTO.getUnit().trim())
+                .notes(ingredientDTO.getNotes())
+                .optional(Boolean.TRUE.equals(ingredientDTO.getOptional()))
+                .recipe(recipe)
+                .build();
+            recipe.getIngredients().add(ingredient);
+        });
     }
 }

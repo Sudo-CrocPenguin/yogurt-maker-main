@@ -2,8 +2,8 @@
 
 # Yogurt Maker API
 
-**API REST para gestionar producción artesanal de yogurt.**  
-Recetas, lotes de producción, control de temperatura y monitoreo — todo documentado con Swagger UI.
+**API REST en Spring Boot para gestionar recetas de yogurt, lotes de producción y monitoreo de temperaturas durante el proceso.**  
+Recetas, lotes de producción, control de temperatura y monitoreo, todo documentado con Swagger UI.
 
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.3-6DB33F?style=flat-square&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/21/)
@@ -18,9 +18,9 @@ Recetas, lotes de producción, control de temperatura y monitoreo — todo docum
 
 ## ¿Qué hace esta API?
 
-Yogurt Maker modela el proceso real de producción artesanal de yogurt como una API REST. Podés crear recetas con sus ingredientes, iniciar lotes de producción que avanzan paso a paso, registrar temperaturas manualmente y consultar un dashboard de monitoreo en tiempo real.
+Yogurt Maker modela el proceso real de producción artesanal de yogurt como una API REST. Permite crear recetas con sus ingredientes, iniciar lotes de producción, registrar temperaturas manualmente y consultar un dashboard de monitoreo.
 
-Está pensada como backend listo para consumir: arquitectura limpia en capas, DTOs para desacoplar la API de las entidades, manejo global de errores y documentación automática con Swagger.
+La aplicación usa arquitectura por capas, DTOs de entrada, manejo global de errores, validación con Jakarta Bean Validation y documentación automática con SpringDoc OpenAPI.
 
 ---
 
@@ -31,171 +31,180 @@ Está pensada como backend listo para consumir: arquitectura limpia en capas, DT
 | Java 21 | Lenguaje principal |
 | Spring Boot 4.0.3 | Framework backend |
 | Spring Data JPA + Hibernate | ORM y acceso a datos |
-| H2 Database | Base de datos en memoria (dev/test) |
+| H2 Database | Base de datos en memoria para desarrollo |
 | SpringDoc OpenAPI 2.8.0 | Swagger UI automático |
-| Lombok | Elimina boilerplate |
-| Maven Wrapper | Sin necesidad de Maven instalado |
+| Lombok | Reduce boilerplate |
+| Maven Wrapper | Ejecuta Maven sin instalación global |
 
 ---
 
-## Instalación
+## Requisitos
 
-El proyecto incluye Maven Wrapper — **no necesitás tener Maven instalado**.
-
-**Requisito único:** Java 21 o superior.
+- Java 21 o superior
 
 ```bash
-java --version   # debe mostrar 21.x.x
+java --version
 ```
 
-### Clonar y ejecutar
+---
+
+## Instalación y ejecución
 
 ```bash
 git clone <url-del-repo>
 cd yogurt-maker
+./mvnw spring-boot:run
 ```
 
-**Linux / macOS**
+En Linux/macOS, si hace falta:
+
 ```bash
 chmod +x mvnw
-./mvnw clean spring-boot:run
 ```
 
-**Windows**
+Cuando veas `Started DemoApplication in X.XXX seconds`, la API está disponible en:
+
+| Recurso | URL |
+|---|---|
+| API | `http://localhost:8080/api` |
+| Swagger UI | `http://localhost:8080/swagger-ui.html` |
+| OpenAPI JSON | `http://localhost:8080/v3/api-docs` |
+| H2 Console | `http://localhost:8080/h2-console` |
+
+La base de datos es H2 en memoria (`jdbc:h2:mem:yogurtdb`) y se recrea al iniciar la aplicación.
+
+---
+
+## Tests
+
 ```bash
-./mvnw clean spring-boot:run
+./mvnw test
 ```
 
-Cuando veas `Started DemoApplication in X.XXX seconds`, la API está lista.
+La suite incluye una prueba de carga de contexto Spring y pruebas unitarias para reglas de negocio de recetas, lotes y monitoreo.
 
 ---
 
 ## Documentación interactiva
 
-Una vez iniciado el servidor, abrí Swagger UI en el navegador:
+Desde Swagger UI podés explorar y probar los endpoints sin Postman ni herramientas adicionales:
 
-```
+```text
 http://localhost:8080/swagger-ui.html
 ```
 
-Desde ahí podés explorar y probar todos los endpoints sin necesidad de Postman ni ninguna herramienta adicional.
-
 ---
 
-## Endpoints
+## Endpoints principales
 
 ### Recetas
 
-```
-GET    /api/recipes           → listar todas las recetas
-GET    /api/recipes/{id}      → obtener una receta
-POST   /api/recipes           → crear receta con ingredientes
-PUT    /api/recipes/{id}      → actualizar receta
-DELETE /api/recipes/{id}      → eliminar receta
+```text
+GET    /api/recipes                  listar recetas activas
+GET    /api/recipes/{id}             obtener una receta
+GET    /api/recipes/search           buscar recetas por keyword
+POST   /api/recipes                  crear receta con ingredientes
+PUT    /api/recipes/{id}             actualizar receta
+PATCH  /api/recipes/{id}/activate    activar receta
+PATCH  /api/recipes/{id}/deactivate  desactivar receta
 ```
 
 ### Lotes de producción
 
-```
-GET    /api/batches           → listar lotes
-GET    /api/batches/{id}      → detalle de un lote
-POST   /api/batches/start     → iniciar lote desde una receta
-PUT    /api/batches/{id}/next → avanzar al siguiente paso
-PUT    /api/batches/{id}/fail → marcar lote como fallido
+```text
+GET    /api/batches                       listar lotes
+GET    /api/batches/{id}                  detalle de un lote
+POST   /api/batches                       iniciar lote desde una receta
+POST   /api/batches/{id}/heating          iniciar calentamiento
+POST   /api/batches/{id}/inoculating      iniciar inoculación
+POST   /api/batches/{id}/incubation       iniciar incubación
+POST   /api/batches/{id}/refrigeration    iniciar refrigeración
+POST   /api/batches/{id}/complete         completar lote
+POST   /api/batches/{id}/fail             marcar lote como fallido
+POST   /api/batches/{id}/temperature      registrar temperatura manual
 ```
 
-### Monitoreo y temperatura
+### Monitoreo
 
-```
-GET    /api/monitoring/dashboard       → resumen general de producción
-POST   /api/monitoring/temperature     → registrar temperatura manualmente
-GET    /api/monitoring/temperature/{batchId} → historial de temperaturas de un lote
+```text
+GET    /api/monitoring/dashboard
+GET    /api/monitoring/batches/active
+GET    /api/monitoring/batches/{id}/temperature
+GET    /api/monitoring/batches/{id}/temperature-logs
 ```
 
 ---
 
-## Arquitectura
+## Módulos principales
 
-Capas bien separadas siguiendo MVC clásico:
-
-```
-Controller → Service → Repository → DB
-```
-
-- **Controller** — recibe peticiones HTTP, delega en servicios, no tiene lógica de negocio
-- **Service** — lógica de negocio y validaciones
-- **Repository** — interfaces JPA, consultas a la BD
-- **Model / Entity** — clases que mapean a tablas (`Recipe`, `YogurtBatch`, `Ingredient`, `TemperatureLog`)
-- **DTO** — objetos de transferencia que desacoplan la API de las entidades internas
-- **Exception** — `GlobalExceptionHandler` centraliza todos los errores y devuelve JSON limpio
-
----
-
-## Estructura del proyecto
-
-```
-yogurt-maker/
-├── pom.xml
-├── mvnw / mvnw.cmd
-└── src/main/
-    ├── java/com/danieldev87/demo/
-    │   ├── DemoApplication.java
-    │   ├── config/
-    │   │   └── SpringDocConfig.java        # Configuración Swagger
-    │   ├── domain/
-    │   │   ├── controller/
-    │   │   │   ├── RecipeController.java
-    │   │   │   ├── YogurtBatchController.java
-    │   │   │   └── MonitoringController.java
-    │   │   ├── model/
-    │   │   │   ├── Recipe.java
-    │   │   │   ├── Ingredient.java
-    │   │   │   ├── YogurtBatch.java
-    │   │   │   └── TemperatureLog.java
-    │   │   ├── repository/
-    │   │   │   ├── RecipeRepository.java
-    │   │   │   ├── YogurtBatchRepository.java
-    │   │   │   └── TemperatureLogRepository.java
-    │   │   └── service/
-    │   │       ├── RecipeService.java
-    │   │       ├── YogurtMakingService.java
-    │   │       └── TemperatureControlService.java
-    │   ├── dto/
-    │   │   ├── RecipeDTO.java
-    │   │   ├── IngredientDTO.java
-    │   │   ├── BatchDTO.java
-    │   │   ├── MonitoringDTO.java
-    │   │   └── TemperatureRecordDTO.java
-    │   └── exception/
-    │       ├── BusinessException.java
-    │       └── GlobalExceptionHandler.java
-    └── resources/
-        └── application.properties
-```
+- **`RecipeController`**: creación, actualización, búsqueda y activación/desactivación de recetas.
+- **`YogurtBatchController`**: ciclo de vida de lotes, transiciones de estado y registro manual de temperaturas.
+- **`MonitoringController`**: lotes activos, historial de temperatura y dashboard de producción.
 
 ---
 
 ## Flujo de producción
 
-Un lote sigue estos estados en orden:
+Un lote sigue estos estados:
 
-```
-INICIADO → PASTEURIZANDO → ENFRIANDO → INOCULANDO → FERMENTANDO → COMPLETADO
-                                                                 ↘ FALLIDO
+```text
+PREPARING -> HEATING -> COOLING -> INOCULATING -> INCUBATING -> REFRIGERATING -> COMPLETED
+                                                                                  -> FAILED
 ```
 
-Cada llamada a `PUT /api/batches/{id}/next` avanza al siguiente estado. En cualquier punto podés registrar temperaturas o marcar el lote como fallido.
+Los estados activos son todos los no terminales: desde `PREPARING` hasta `REFRIGERATING`.
+
+---
+
+## Arquitectura
+
+```text
+Controller -> Service -> Repository -> DB
+```
+
+- **Controller**: recibe peticiones HTTP y delega en servicios.
+- **Service**: concentra lógica de negocio y validaciones.
+- **Repository**: interfaces JPA y consultas a base de datos.
+- **Model / Entity**: entidades persistidas (`Recipe`, `YogurtBatch`, `Ingredient`, `TemperatureLog`).
+- **DTO**: objetos de transferencia para solicitudes REST.
+- **Exception**: `GlobalExceptionHandler` centraliza respuestas de error.
+
+---
+
+## Estructura del proyecto
+
+```text
+yogurt-maker/
+├── pom.xml
+├── mvnw / mvnw.cmd
+├── docs/
+│   └── MANTENIMIENTO.md
+└── src/
+    ├── main/java/com/danieldev87/demo/
+    │   ├── config/
+    │   ├── domain/
+    │   │   ├── controller/
+    │   │   ├── model/
+    │   │   ├── repository/
+    │   │   └── service/
+    │   ├── dto/
+    │   └── exception/
+    └── test/
+```
+
+---
+
+## Notas técnicas
+
+- Las entradas REST usan Bean Validation real mediante `spring-boot-starter-validation`.
+- Los errores de negocio, validación y recursos no encontrados devuelven respuestas JSON uniformes.
+- Los procesos simulados de calentamiento/incubación corren en un `ThreadPoolTaskExecutor` gestionado por Spring.
+- No se versionan capturas, videos ni exports generados de OpenAPI; la documentación actual se obtiene desde Swagger/OpenAPI en runtime.
+
+Más detalles de mantenimiento y deuda técnica en [docs/MANTENIMIENTO.md](docs/MANTENIMIENTO.md).
 
 ---
 
 ## Licencia
 
-[Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) — libre para usar, modificar y distribuir.
-
----
-
-<div align="center">
-
-_Hecho con Java, Spring y demasiado yogurt de prueba._
-
-</div>
+[Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0)

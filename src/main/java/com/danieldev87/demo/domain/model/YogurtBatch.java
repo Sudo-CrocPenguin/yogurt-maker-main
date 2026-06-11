@@ -3,13 +3,18 @@ package com.danieldev87.demo.domain.model;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Entidad principal que representa un lote de producción de yogurt.
@@ -18,7 +23,8 @@ import lombok.NoArgsConstructor;
  */
 @Entity
 @Table(name = "yogurt_batches")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -37,11 +43,11 @@ public class YogurtBatch {
     
     /**
      * Código único del lote generado automáticamente.
-     * Formato: YB-{timestamp}
+     * Formato: YB-{timestamp}-{sufijo corto}
      */
-    @Column(nullable = false)
-    @Schema(description = "Código único del lote generado automáticamente con formato YB-{timestamp}", 
-            example = "YB-1705324800000",
+    @Column(nullable = false, unique = true, updatable = false)
+    @Schema(description = "Código único del lote generado automáticamente con formato YB-{timestamp}-{sufijo corto}",
+            example = "YB-1705324800000-A1B2C3D4",
             accessMode = Schema.AccessMode.READ_ONLY)
     private String batchCode;
     
@@ -50,6 +56,8 @@ public class YogurtBatch {
      */
     @ManyToOne
     @JoinColumn(name = "recipe_id", nullable = false)
+    @JsonIgnoreProperties({"active"})
+    @ToString.Exclude
     @Schema(description = "Receta de yogurt utilizada como base para este lote de producción",
             required = true)
     private Recipe recipe;
@@ -61,7 +69,7 @@ public class YogurtBatch {
     @Column(nullable = false)
     @Schema(description = "Estado actual del lote en el ciclo de producción de yogurt", 
             example = "INCUBATING",
-            allowableValues = {"PREPARING", "HEATING", "COOLING", "INOCULATING", "INCUBATING", "REFIRGERATING", "COMPLETED", "FAILED"},
+            allowableValues = {"PREPARING", "HEATING", "COOLING", "INOCULATING", "INCUBATING", "REFRIGERATING", "COMPLETED", "FAILED"},
             required = true)
     private BatchStatus status;
     
@@ -135,8 +143,9 @@ public class YogurtBatch {
     /**
      * Lista de registros de temperatura asociados a este lote.
      */
-    @OneToMany(mappedBy = "batch", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "batch", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @ToString.Exclude
     @Schema(description = "Historial de registros de temperatura tomados durante el proceso de producción",
             accessMode = Schema.AccessMode.READ_ONLY)
     private List<TemperatureLog> temperatureLogs = new ArrayList<>();
@@ -152,7 +161,7 @@ public class YogurtBatch {
     /**
      * Fecha y hora de creación del registro en el sistema.
      */
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     @Schema(description = "Fecha y hora en que se creó el registro del lote en el sistema (formato ISO 8601)", 
             example = "2024-01-15T10:00:00",
             accessMode = Schema.AccessMode.READ_ONLY)
@@ -172,8 +181,12 @@ public class YogurtBatch {
      */
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        batchCode = "YB-" + System.currentTimeMillis();
+        LocalDateTime now = LocalDateTime.now();
+        createdAt = now;
+        updatedAt = now;
+        batchCode = "YB-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString()
+            .substring(0, 8)
+            .toUpperCase();
     }
     
     /**

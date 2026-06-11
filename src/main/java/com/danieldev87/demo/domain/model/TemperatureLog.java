@@ -1,5 +1,7 @@
 package com.danieldev87.demo.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -12,7 +14,8 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "temperature_logs")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -34,6 +37,8 @@ public class TemperatureLog {
      */
     @ManyToOne
     @JoinColumn(name = "batch_id", nullable = false)
+    @JsonIgnore
+    @ToString.Exclude
     @Schema(description = "Lote de yogurt al que corresponde esta medición de temperatura",
             accessMode = Schema.AccessMode.READ_ONLY)
     private YogurtBatch batch;
@@ -76,6 +81,13 @@ public class TemperatureLog {
             example = "Lectura verificada con termómetro digital calibrado",
             maxLength = 200)
     private String notes;
+
+    @PrePersist
+    protected void onCreate() {
+        if (recordedAt == null) {
+            recordedAt = LocalDateTime.now();
+        }
+    }
     
     /**
      * Enumeración de los tipos de registro de temperatura disponibles.

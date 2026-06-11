@@ -3,6 +3,9 @@ package com.danieldev87.demo.dto;
 import com.danieldev87.demo.domain.model.TemperatureLog;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
@@ -22,6 +25,9 @@ public class TemperatureRecordDTO {
             minimum = "0", 
             maximum = "100",
             required = true)
+    @NotNull(message = "La temperatura es obligatoria")
+    @DecimalMin(value = "0.0", message = "La temperatura no puede ser menor que 0°C")
+    @DecimalMax(value = "100.0", message = "La temperatura no puede superar 100°C")
     private Double temperature;
     
     /**
@@ -32,5 +38,6 @@ public class TemperatureRecordDTO {
             example = "INCUBATION",
             allowableValues = {"HEATING", "COOLING", "INCUBATION", "REFRIGERATION", "MANUAL"},
             required = true)
+    @NotNull(message = "El tipo de registro de temperatura es obligatorio")
     private TemperatureLog.LogType type;
 }

@@ -13,15 +13,10 @@ import com.danieldev87.demo.domain.model.Recipe;
 @Repository
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     
-    Optional<Recipe> findByName(String name);
+    Optional<Recipe> findByNameIgnoreCase(String name);
     
     List<Recipe> findByActive(Boolean active);
-    
-    List<Recipe> findByDifficulty(Recipe.DifficultyLevel difficulty);
-    
-    @Query("SELECT r FROM Recipe r WHERE r.active = true AND r.difficulty = :difficulty")
-    List<Recipe> findActiveByDifficulty(@Param("difficulty") Recipe.DifficultyLevel difficulty);
-    
+
     @Query("SELECT r FROM Recipe r WHERE LOWER(r.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(r.description) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Recipe> searchByKeyword(@Param("keyword") String keyword);
 }

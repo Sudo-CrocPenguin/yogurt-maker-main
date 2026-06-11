@@ -1,5 +1,7 @@
 package com.danieldev87.demo.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -10,7 +12,8 @@ import lombok.*;
  */
 @Entity
 @Table(name = "ingredients")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -61,6 +64,8 @@ public class Ingredient {
      */
     @ManyToOne
     @JoinColumn(name = "recipe_id", nullable = false)
+    @JsonIgnore
+    @ToString.Exclude
     @Schema(description = "Receta de yogurt a la que pertenece este ingrediente",
             accessMode = Schema.AccessMode.READ_ONLY)
     private Recipe recipe;
@@ -77,8 +82,9 @@ public class Ingredient {
      * Indica si el ingrediente es opcional en la receta.
      */
     @Column(nullable = false)
+    @Builder.Default
     @Schema(description = "Indica si el ingrediente es opcional (true) o es obligatorio (false) para la receta", 
             example = "false",
             defaultValue = "false")
-    private Boolean optional;
+    private Boolean optional = false;
 }

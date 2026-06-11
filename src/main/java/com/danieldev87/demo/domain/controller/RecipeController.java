@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +27,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -35,6 +37,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/recipes")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "Gestión de Recetas", 
      description = "Endpoints para administrar las recetas de yogurt: creación, consulta, actualización y activación/desactivación de recetas disponibles en el sistema")
 public class RecipeController {
@@ -195,6 +198,7 @@ public class RecipeController {
     @GetMapping("/search")
     public ResponseEntity<List<Recipe>> searchRecipes(
             @Parameter(description = "Palabra clave para buscar en nombres y descripciones de recetas", required = true, example = "natural")
+            @NotBlank(message = "La palabra clave de búsqueda es obligatoria")
             @RequestParam String keyword) {
         return ResponseEntity.ok(recipeService.searchRecipes(keyword));
     }

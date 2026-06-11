@@ -7,8 +7,10 @@ import jakarta.persistence.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Entidad principal que representa una receta de yogurt.
@@ -17,7 +19,8 @@ import lombok.NoArgsConstructor;
  */
 @Entity
 @Table(name = "recipes")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -57,8 +60,9 @@ public class Recipe {
      * Lista de ingredientes necesarios para la receta.
      * Relación uno a muchos con cascada completa.
      */
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @ToString.Exclude
     @Schema(description = "Lista de ingredientes necesarios para preparar esta receta de yogurt")
     private List<Ingredient> ingredients = new ArrayList<>();
     
@@ -181,10 +185,11 @@ public class Recipe {
      * Las recetas desactivadas no aparecen para iniciar nuevos lotes.
      */
     @Column(nullable = false)
+    @Builder.Default
     @Schema(description = "Indica si la receta está activa y disponible para usar en nuevos lotes", 
             example = "true",
             defaultValue = "true")
-    private Boolean active;
+    private Boolean active = true;
     
     /**
      * Enumeración de niveles de dificultad disponibles para las recetas.

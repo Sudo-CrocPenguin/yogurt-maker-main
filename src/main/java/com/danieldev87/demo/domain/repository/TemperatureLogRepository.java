@@ -2,6 +2,7 @@ package com.danieldev87.demo.domain.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,7 +17,7 @@ public interface TemperatureLogRepository extends JpaRepository<TemperatureLog, 
     
     List<TemperatureLog> findByBatch(YogurtBatch batch);
     
-    List<TemperatureLog> findByBatchAndTypeOrderByRecordedAtDesc(Long batchId, TemperatureLog.LogType type);
+    Optional<TemperatureLog> findFirstByBatchIdOrderByRecordedAtDesc(Long batchId);
     
     @Query("SELECT tl FROM TemperatureLog tl WHERE tl.batch.id = :batchId AND tl.recordedAt BETWEEN :startTime AND :endTime")
     List<TemperatureLog> findByBatchAndTimeRange(@Param("batchId") Long batchId, 

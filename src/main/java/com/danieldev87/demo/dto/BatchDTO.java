@@ -1,6 +1,10 @@
 package com.danieldev87.demo.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
@@ -24,6 +28,7 @@ public class BatchDTO {
         @Schema(description = "ID único de la receta de yogurt a utilizar como base para el lote", 
                 example = "1", 
                 required = true)
+        @NotNull(message = "El ID de la receta es obligatorio")
         private Long recipeId;
         
         /**
@@ -34,6 +39,7 @@ public class BatchDTO {
                 example = "2.5", 
                 minimum = "0.1",
                 nullable = true)
+        @DecimalMin(value = "0.1", message = "El volumen personalizado de leche debe ser mayor o igual a 0.1 litros")
         private Double customMilkVolume;
         
         /**
@@ -44,6 +50,7 @@ public class BatchDTO {
                 example = "3.0", 
                 minimum = "0.5",
                 nullable = true)
+        @DecimalMin(value = "0.5", message = "La cantidad personalizada de fermento debe ser mayor o igual a 0.5 cucharadas")
         private Double customStarterAmount;
     }
     
@@ -63,6 +70,8 @@ public class BatchDTO {
                 example = "La temperatura de incubación superó los 50°C, comprometiendo los cultivos.",
                 required = true,
                 minLength = 5)
+        @NotBlank(message = "El motivo de fallo es obligatorio")
+        @Size(min = 5, max = 500, message = "El motivo de fallo debe tener entre 5 y 500 caracteres")
         private String reason;
     }
 }

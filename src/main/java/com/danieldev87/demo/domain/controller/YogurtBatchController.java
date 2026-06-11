@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -69,7 +70,7 @@ public class YogurtBatchController {
     @PostMapping
     public ResponseEntity<YogurtBatch> startNewBatch(
             @Parameter(description = "Datos para iniciar el lote: recipeId (obligatorio), customMilkVolume y customStarterAmount (opcionales)", required = true)
-            @RequestBody BatchDTO.StartBatchRequest request) {
+            @Valid @RequestBody BatchDTO.StartBatchRequest request) {
         YogurtBatch batch = yogurtMakingService.startNewBatch(
             request.getRecipeId(), 
             request.getCustomMilkVolume(), 
@@ -286,7 +287,7 @@ public class YogurtBatchController {
             @Parameter(description = "ID único del lote de yogurt a marcar como fallido", required = true, example = "1")
             @PathVariable Long batchId, 
             @Parameter(description = "Objeto con el motivo del fallo (campo reason obligatorio)", required = true)
-            @RequestBody BatchDTO.FailRequest request) {
+            @Valid @RequestBody BatchDTO.FailRequest request) {
         YogurtBatch batch = yogurtMakingService.markAsFailed(batchId, request.getReason());
         return ResponseEntity.ok(batch);
     }
@@ -385,7 +386,7 @@ public class YogurtBatchController {
             @Parameter(description = "ID único del lote de yogurt", required = true, example = "1")
             @PathVariable Long batchId, 
             @Parameter(description = "Datos de temperatura a registrar: valor (temperature) y tipo de registro (type)", required = true)
-            @RequestBody TemperatureRecordDTO request) {
+            @Valid @RequestBody TemperatureRecordDTO request) {
         yogurtMakingService.recordTemperature(batchId, request.getTemperature(), request.getType());
         return ResponseEntity.ok().build();
     }
