@@ -32,5 +32,14 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### Frontend ###
+frontend/node_modules/
+frontend/dist/
+frontend/*.tsbuildinfo
+frontend/vite.config.d.ts
+frontend/vite.config.js
+frontend/.env.local
+frontend/.env.*.local
+
 ### VS Code ###
 .vscode/
