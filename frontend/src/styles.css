@@ -735,6 +735,81 @@ h1 {
   text-align: right;
 }
 
+.monitoring-selector {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+}
+
+.temperature-chart {
+  position: relative;
+  border: 1px solid #dce5df;
+  border-radius: 8px;
+  background: #fbfdfb;
+  padding: 12px 14px 14px;
+}
+
+.temperature-chart svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.chart-grid-line {
+  stroke: #d8e4dd;
+  stroke-width: 1;
+}
+
+.chart-line {
+  stroke: #1f6b45;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chart-dot {
+  fill: #ffffff;
+  stroke: #1f6b45;
+  stroke-width: 3;
+}
+
+.chart-scale,
+.chart-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: #607168;
+  font-size: 0.82rem;
+}
+
+.chart-meta {
+  margin-top: 8px;
+}
+
+.chart-meta strong {
+  color: #203229;
+}
+
+.chart-empty {
+  min-height: 220px;
+  border: 1px dashed #b9c8bf;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 6px;
+  color: #64766c;
+  background: #fbfdfb;
+  text-align: center;
+  padding: 20px;
+}
+
+.chart-empty strong {
+  color: #21342a;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -843,6 +918,10 @@ td {
   }
 
   .inline-form {
+    grid-template-columns: 1fr;
+  }
+
+  .monitoring-selector {
     grid-template-columns: 1fr;
   }
 

@@ -3,6 +3,7 @@ import { Icon } from "./components/Icon";
 import { apiClient } from "./api/client";
 import { BatchesPage } from "./pages/BatchesPage";
 import { DashboardPage } from "./pages/DashboardPage";
+import { MonitoringPage } from "./pages/MonitoringPage";
 import { RecipesPage } from "./pages/RecipesPage";
 
 type ViewId = "dashboard" | "recipes" | "batches" | "monitoring";
@@ -73,6 +74,8 @@ function App() {
             <RecipesPage refreshKey={refreshKey} />
           ) : activeView === "batches" ? (
             <BatchesPage refreshKey={refreshKey} />
+          ) : activeView === "monitoring" ? (
+            <MonitoringPage refreshKey={refreshKey} />
           ) : (
             <section className="empty-state">
               <Icon name={views.find((view) => view.id === activeView)?.icon ?? "activity"} size={38} />
