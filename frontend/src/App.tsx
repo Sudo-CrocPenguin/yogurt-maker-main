@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Icon } from "./components/Icon";
 import { apiClient } from "./api/client";
 import { DashboardPage } from "./pages/DashboardPage";
+import { RecipesPage } from "./pages/RecipesPage";
 
 type ViewId = "dashboard" | "recipes" | "batches" | "monitoring";
 
@@ -67,6 +68,8 @@ function App() {
         <div className="page-body">
           {activeView === "dashboard" ? (
             <DashboardPage refreshKey={refreshKey} />
+          ) : activeView === "recipes" ? (
+            <RecipesPage refreshKey={refreshKey} />
           ) : (
             <section className="empty-state">
               <Icon name={views.find((view) => view.id === activeView)?.icon ?? "activity"} size={38} />

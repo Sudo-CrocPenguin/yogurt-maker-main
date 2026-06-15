@@ -118,6 +118,17 @@ button {
   gap: 18px;
 }
 
+.split-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.85fr) minmax(420px, 1.15fr);
+  align-items: start;
+  gap: 18px;
+}
+
+.toolbar {
+  margin-bottom: 16px;
+}
+
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -456,6 +467,141 @@ h1 {
   overflow-x: auto;
 }
 
+.card-list {
+  display: grid;
+  gap: 12px;
+}
+
+.list-card {
+  border: 1px solid #dce5df;
+  border-radius: 8px;
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+  background: #fbfdfb;
+}
+
+.list-card.is-selected {
+  border-color: #1f6b45;
+  box-shadow: 0 0 0 3px rgba(31, 107, 69, 0.12);
+}
+
+.list-card-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.list-card h3 {
+  margin-bottom: 0;
+  font-size: 1rem;
+}
+
+.list-card p {
+  color: #586a61;
+  margin-bottom: 12px;
+}
+
+.compact-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.compact-facts div {
+  border: 1px solid #e2eae5;
+  border-radius: 8px;
+  padding: 8px;
+  background: #ffffff;
+}
+
+.compact-facts dt {
+  color: #65756c;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.compact-facts dd {
+  margin: 2px 0 0;
+  color: #203229;
+  font-weight: 800;
+}
+
+.card-actions,
+.form-actions,
+.form-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.recipe-form {
+  display: grid;
+  gap: 16px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.form-grid.three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.form-section-header {
+  border-top: 1px solid #e4ebe6;
+  padding-top: 16px;
+}
+
+.form-section-header h3 {
+  margin-bottom: 2px;
+  font-size: 1rem;
+}
+
+.form-section-header p {
+  margin-bottom: 0;
+  color: #65756c;
+  font-size: 0.86rem;
+}
+
+.ingredient-list {
+  display: grid;
+  gap: 12px;
+}
+
+.ingredient-row {
+  border: 1px solid #dce5df;
+  border-radius: 8px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.65fr 0.75fr 1fr auto auto;
+  align-items: end;
+  gap: 10px;
+  background: #fbfdfb;
+}
+
+.checkbox-field {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #31443a;
+  font-weight: 700;
+}
+
+.checkbox-field input {
+  width: 18px;
+  height: 18px;
+  accent-color: #1f6b45;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -544,6 +690,19 @@ td {
 
   .metric-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .split-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid,
+  .form-grid.three {
+    grid-template-columns: 1fr;
+  }
+
+  .ingredient-row {
+    grid-template-columns: 1fr;
   }
 
   .status-row {
