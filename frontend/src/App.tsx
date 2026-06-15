@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Icon } from "./components/Icon";
 import { apiClient } from "./api/client";
+import { DashboardPage } from "./pages/DashboardPage";
 
 type ViewId = "dashboard" | "recipes" | "batches" | "monitoring";
 
@@ -13,6 +14,7 @@ const views: Array<{ id: ViewId; label: string; icon: Parameters<typeof Icon>[0]
 
 function App() {
   const [activeView, setActiveView] = useState<ViewId>("dashboard");
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const currentTitle = useMemo(
     () => views.find((view) => view.id === activeView)?.label ?? "Dashboard",
@@ -51,16 +53,28 @@ function App() {
             <span className="eyebrow">API conectada a {apiClient.baseUrl}</span>
             <h1>{currentTitle}</h1>
           </div>
-          <button className="icon-button" type="button" title="Refrescar vista" aria-label="Refrescar vista">
+          <button
+            className="icon-button"
+            type="button"
+            title="Refrescar vista"
+            aria-label="Refrescar vista"
+            onClick={() => setRefreshKey((current) => current + 1)}
+          >
             <Icon name="refresh" />
           </button>
         </header>
 
-        <section className="empty-state">
-          <Icon name={views.find((view) => view.id === activeView)?.icon ?? "activity"} size={38} />
-          <h2>Base del panel lista</h2>
-          <p>Las pantallas de operacion se conectaran al backend en el siguiente bloque.</p>
-        </section>
+        <div className="page-body">
+          {activeView === "dashboard" ? (
+            <DashboardPage refreshKey={refreshKey} />
+          ) : (
+            <section className="empty-state">
+              <Icon name={views.find((view) => view.id === activeView)?.icon ?? "activity"} size={38} />
+              <h2>Modulo en desarrollo</h2>
+              <p>Esta pantalla se conectara al backend en el siguiente bloque funcional.</p>
+            </section>
+          )}
+        </div>
       </main>
     </div>
   );

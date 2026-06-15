@@ -109,6 +109,42 @@ button {
   flex-direction: column;
 }
 
+.page-body {
+  padding: 24px;
+}
+
+.content-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.metric-card {
+  border: 1px solid #dce5df;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.metric-card span {
+  color: #65756c;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.metric-card strong {
+  color: #16241c;
+  font-size: 2rem;
+  line-height: 1;
+}
+
 .topbar {
   min-height: 88px;
   padding: 20px 28px;
@@ -373,8 +409,81 @@ h1 {
   color: #8f2828;
 }
 
+.status-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.status-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 44px minmax(140px, 240px);
+  align-items: center;
+  gap: 14px;
+}
+
+.status-row > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.status-row > div:first-child span:last-child {
+  color: #44564d;
+  font-weight: 700;
+}
+
+.status-row strong {
+  text-align: right;
+}
+
+.meter {
+  height: 9px;
+  border-radius: 999px;
+  background: #edf2ef;
+  overflow: hidden;
+}
+
+.meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #1f6b45;
+}
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border-bottom: 1px solid #e4ebe6;
+  padding: 12px 10px;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+th {
+  color: #607168;
+  font-size: 0.78rem;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+td {
+  color: #24362d;
+  font-size: 0.9rem;
+}
+
 .empty-state {
-  min-height: calc(100vh - 88px);
+  min-height: calc(100vh - 136px);
   display: grid;
   place-items: center;
   align-content: center;
@@ -427,5 +536,27 @@ h1 {
 
   .topbar {
     padding: 18px;
+  }
+
+  .page-body {
+    padding: 16px;
+  }
+
+  .metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .status-row {
+    grid-template-columns: 1fr 36px;
+  }
+
+  .status-row .meter {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 540px) {
+  .metric-grid {
+    grid-template-columns: 1fr;
   }
 }
