@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Icon } from "./components/Icon";
 import { apiClient } from "./api/client";
+import { BatchesPage } from "./pages/BatchesPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { RecipesPage } from "./pages/RecipesPage";
 
@@ -70,6 +71,8 @@ function App() {
             <DashboardPage refreshKey={refreshKey} />
           ) : activeView === "recipes" ? (
             <RecipesPage refreshKey={refreshKey} />
+          ) : activeView === "batches" ? (
+            <BatchesPage refreshKey={refreshKey} />
           ) : (
             <section className="empty-state">
               <Icon name={views.find((view) => view.id === activeView)?.icon ?? "activity"} size={38} />
