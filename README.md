@@ -1,13 +1,15 @@
 <div align="center">
 
-# Yogurt Maker API
+# Yogurt Maker
 
-**API REST en Spring Boot para gestionar recetas de yogurt, lotes de producción y monitoreo de temperaturas durante el proceso.**  
-Recetas, lotes de producción, control de temperatura y monitoreo, todo documentado con Swagger UI.
+**Aplicación full stack para gestionar recetas de yogurt, lotes de producción y monitoreo de temperaturas durante el proceso.**  
+Incluye API REST en Spring Boot, panel frontend en React y documentación interactiva con Swagger UI.
 
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.3-6DB33F?style=flat-square&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/21/)
 [![Maven](https://img.shields.io/badge/Maven-3.9-C71A36?style=flat-square&logo=apachemaven&logoColor=white)](https://maven.apache.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-7-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vite.dev/)
 [![Swagger](https://img.shields.io/badge/Swagger-UI-85EA2D?style=flat-square&logo=swagger&logoColor=black)](https://swagger.io/tools/swagger-ui/)
 [![H2](https://img.shields.io/badge/H2-in--memory-004990?style=flat-square)](https://www.h2database.com/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue?style=flat-square)](https://www.apache.org/licenses/LICENSE-2.0)
@@ -16,11 +18,11 @@ Recetas, lotes de producción, control de temperatura y monitoreo, todo document
 
 ---
 
-## ¿Qué hace esta API?
+## ¿Qué hace esta aplicación?
 
-Yogurt Maker modela el proceso real de producción artesanal de yogurt como una API REST. Permite crear recetas con sus ingredientes, iniciar lotes de producción, registrar temperaturas manualmente y consultar un dashboard de monitoreo.
+Yogurt Maker modela el proceso real de producción artesanal de yogurt. Permite crear recetas con sus ingredientes, iniciar lotes de producción, avanzar etapas, registrar temperaturas manualmente y consultar un dashboard de monitoreo.
 
-La aplicación usa arquitectura por capas, DTOs de entrada, manejo global de errores, validación con Jakarta Bean Validation y documentación automática con SpringDoc OpenAPI.
+El backend usa arquitectura por capas, DTOs de entrada, manejo global de errores, validación con Jakarta Bean Validation y documentación automática con SpringDoc OpenAPI. El frontend ofrece un panel operativo para consumir esos endpoints desde el navegador.
 
 ---
 
@@ -35,15 +37,19 @@ La aplicación usa arquitectura por capas, DTOs de entrada, manejo global de err
 | SpringDoc OpenAPI 2.8.0 | Swagger UI automático |
 | Lombok | Reduce boilerplate |
 | Maven Wrapper | Ejecuta Maven sin instalación global |
+| React 19 + TypeScript | Panel web de operación |
+| Vite 7 | Desarrollo y build del frontend |
 
 ---
 
 ## Requisitos
 
 - Java 21 o superior
+- Node.js 20 o superior para el frontend
 
 ```bash
 java --version
+node --version
 ```
 
 ---
@@ -53,7 +59,7 @@ java --version
 ```bash
 git clone <url-del-repo>
 cd yogurt-maker
-./mvnw spring-boot:run
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
 En Linux/macOS, si hace falta:
@@ -72,6 +78,25 @@ Cuando veas `Started DemoApplication in X.XXX seconds`, la API está disponible 
 | H2 Console | `http://localhost:8080/h2-console` |
 
 La base de datos es H2 en memoria (`jdbc:h2:mem:yogurtdb`) y se recrea al iniciar la aplicación.
+El perfil `dev` carga recetas iniciales desde `data.sql` y habilita CORS para el frontend en `http://localhost:5173`.
+
+### Frontend
+
+En otra terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+El panel queda disponible en:
+
+```text
+http://localhost:5173
+```
+
+El frontend consume por defecto `http://localhost:8080/api`. Si necesitás cambiar esa URL, crea `frontend/.env.local` usando `frontend/.env.example` como referencia.
 
 ---
 
@@ -79,9 +104,11 @@ La base de datos es H2 en memoria (`jdbc:h2:mem:yogurtdb`) y se recrea al inicia
 
 ```bash
 ./mvnw test
+cd frontend
+npm run build
 ```
 
-La suite incluye una prueba de carga de contexto Spring y pruebas unitarias para reglas de negocio de recetas, lotes y monitoreo.
+La suite backend incluye una prueba de carga de contexto Spring y pruebas unitarias para reglas de negocio de recetas, lotes y monitoreo. El build del frontend ejecuta TypeScript y genera el bundle de producción.
 
 ---
 
@@ -140,6 +167,10 @@ GET    /api/monitoring/batches/{id}/temperature-logs
 - **`RecipeController`**: creación, actualización, búsqueda y activación/desactivación de recetas.
 - **`YogurtBatchController`**: ciclo de vida de lotes, transiciones de estado y registro manual de temperaturas.
 - **`MonitoringController`**: lotes activos, historial de temperatura y dashboard de producción.
+- **`frontend/src/pages/DashboardPage.tsx`**: métricas generales y lotes activos.
+- **`frontend/src/pages/RecipesPage.tsx`**: búsqueda, creación y edición de recetas.
+- **`frontend/src/pages/BatchesPage.tsx`**: creación de lotes, detalle y control de estados.
+- **`frontend/src/pages/MonitoringPage.tsx`**: resumen térmico, gráfica e historial de temperaturas.
 
 ---
 
@@ -175,9 +206,17 @@ Controller -> Service -> Repository -> DB
 
 ```text
 yogurt-maker/
+├── frontend/
+│   ├── src/
+│   │   ├── api/
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── pages/
+│   │   └── utils/
 ├── pom.xml
 ├── mvnw / mvnw.cmd
 ├── docs/
+│   ├── FRONTEND.md
 │   └── MANTENIMIENTO.md
 └── src/
     ├── main/java/com/danieldev87/demo/
@@ -199,8 +238,10 @@ yogurt-maker/
 - Las entradas REST usan Bean Validation real mediante `spring-boot-starter-validation`.
 - Los errores de negocio, validación y recursos no encontrados devuelven respuestas JSON uniformes.
 - Los procesos simulados de calentamiento/incubación corren en un `ThreadPoolTaskExecutor` gestionado por Spring.
+- El frontend usa `fetch` tipado en `frontend/src/api/client.ts` y componentes propios para mantener el panel ligero.
 - No se versionan capturas, videos ni exports generados de OpenAPI; la documentación actual se obtiene desde Swagger/OpenAPI en runtime.
 
+Guía del frontend en [docs/FRONTEND.md](docs/FRONTEND.md).
 Más detalles de mantenimiento y deuda técnica en [docs/MANTENIMIENTO.md](docs/MANTENIMIENTO.md).
 
 ---
