@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
@@ -56,7 +57,7 @@ public class YogurtBatch {
      */
     @ManyToOne
     @JoinColumn(name = "recipe_id", nullable = false)
-    @JsonIgnoreProperties({"active"})
+    @JsonIgnoreProperties({"active", "ingredients"})
     @ToString.Exclude
     @Schema(description = "Receta de yogurt utilizada como base para este lote de producción",
             required = true)
@@ -145,6 +146,7 @@ public class YogurtBatch {
      */
     @OneToMany(mappedBy = "batch", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @JsonIgnore
     @ToString.Exclude
     @Schema(description = "Historial de registros de temperatura tomados durante el proceso de producción",
             accessMode = Schema.AccessMode.READ_ONLY)
